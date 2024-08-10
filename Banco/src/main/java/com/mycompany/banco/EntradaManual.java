@@ -57,11 +57,11 @@ static {
 
         // Crear los botones
         JButton botonSubOpcion1 = new JButton("Solicitudes");
-        JButton botonSubOpcion2 = new JButton("Movimientos");
+        JButton botonSubOpcion2 = new JButton("Autorizacion de Tarjeta");
         JButton botonSubOpcion3 = new JButton("Consultar Tarjeta");
-        JButton botonSubOpcion4 = new JButton("Autorizacion de Tarjeta");
-        JButton botonSubOpcion5 = new JButton("Cancelacion de Tarjeta");
-        JButton botonSubOpcion7 = new JButton("Estado De Cuenta");
+        JButton botonSubOpcion4 = new JButton("Movimientos");
+        JButton botonSubOpcion5 = new JButton("Estado de Cuenta");
+        JButton botonSubOpcion7 = new JButton("Cancelacion de Tarjeta");
 
         // Agregar ActionListener a los botones
         botonSubOpcion1.addActionListener(new ActionListener() {
@@ -120,25 +120,83 @@ static {
     }
 
     protected void abrirSubOpcion1() {
-
+        SubOpcion1Solicitud subOpcion1Frame = new SubOpcion1Solicitud();
+        desktopPane.add(subOpcion1Frame);
+        subOpcion1Frame.setVisible(true);
+        try {
+            subOpcion1Frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
+        subOpcion1Frame.toFront();
     }
 
     protected void abrirSubOpcion2() {
+        SubOpcion2AutorizacionDeTarjeta subOpcion2Frame = new SubOpcion2AutorizacionDeTarjeta();
+        desktopPane.add(subOpcion2Frame);
+        subOpcion2Frame.setVisible(true);
+        try {
+            subOpcion2Frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
+        subOpcion2Frame.toFront();        
 
     }
 
     protected void abrirSubOpcion3() {
+        SubOpcion3ConsultarTarjeta subOpcion3Frame = new SubOpcion3ConsultarTarjeta();
+        desktopPane.add(subOpcion3Frame);
+        subOpcion3Frame.setVisible(true);
+        try {
+            subOpcion3Frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
+        subOpcion3Frame.toFront();          
 
     }
 
     protected void abrirSubOpcion4() {
+        SubOpcion4Movimientos subOpcion4Frame = new SubOpcion4Movimientos();
+        desktopPane.add(subOpcion4Frame);
+        subOpcion4Frame.setVisible(true);
+        try {
+            subOpcion4Frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
+        subOpcion4Frame.toFront();          
 
     }
 
     protected void abrirSubOpcion5() {
+        SubOpcion5EstadoDeCuentas subOpcion5Frame = new SubOpcion5EstadoDeCuentas();
+        desktopPane.add(subOpcion5Frame);
+        subOpcion5Frame.setVisible(true);
+        try {
+            subOpcion5Frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
+        subOpcion5Frame.toFront();          
 
     }
     
+    protected void abrirSubOpcion6(){
+        
+    }
+    
     protected void abrirSubOpcion7() {
+        SubOpcion7CancelacionDeTarjeta subOpcion7Frame = new SubOpcion7CancelacionDeTarjeta();
+        desktopPane.add(subOpcion7Frame);
+        subOpcion7Frame.setVisible(true);
+        try {
+            subOpcion7Frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
+        subOpcion7Frame.toFront();          
+        
     }
 }
