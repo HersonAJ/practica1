@@ -4,6 +4,8 @@
 
 package com.mycompany.banco;
 
+import com.mycompany.banco.Frontend.InterfazGrafica;
+
 /**
  *
  * @author herson
