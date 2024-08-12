@@ -19,19 +19,7 @@ import javax.swing.UIManager;
  * @author herson
  */
 public class EntradaManual extends JInternalFrame {
-static {
-    try {
-        //tema para la ventana
-        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-            if ("Nimbus".equals(info.getName())) {
-                UIManager.setLookAndFeel(info.getClassName());
-                break;
-            }
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
+
 
 
     protected JDesktopPane desktopPane;
@@ -60,8 +48,8 @@ static {
         JButton botonSubOpcion2 = new JButton("Autorizacion de Tarjeta");
         JButton botonSubOpcion3 = new JButton("Consultar Tarjeta");
         JButton botonSubOpcion4 = new JButton("Movimientos");
-        JButton botonSubOpcion5 = new JButton("Estado de Cuenta");
-        JButton botonSubOpcion7 = new JButton("Cancelacion de Tarjeta");
+        JButton botonSubOpcion5 = new JButton("Cancelacion de Tarjeta");
+        JButton botonSubOpcion6 = new JButton("Reportes");
 
         // Agregar ActionListener a los botones
         botonSubOpcion1.addActionListener(new ActionListener() {
@@ -99,10 +87,10 @@ static {
             }
         });
         
-        botonSubOpcion7.addActionListener(new ActionListener() {
+        botonSubOpcion6.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                abrirSubOpcion7();
+                abrirSubOpcion6();
             }
         });
 
@@ -112,7 +100,7 @@ static {
         panelBotones.add(botonSubOpcion3);
         panelBotones.add(botonSubOpcion4);
         panelBotones.add(botonSubOpcion5);
-        panelBotones.add(botonSubOpcion7);
+        panelBotones.add(botonSubOpcion6);
 
         getContentPane().add(panelBotones, BorderLayout.WEST);
 
@@ -140,8 +128,7 @@ static {
         } catch (java.beans.PropertyVetoException e) {
             e.printStackTrace();
         }
-        subOpcion2Frame.toFront();        
-
+        subOpcion2Frame.toFront();
     }
 
     protected void abrirSubOpcion3() {
@@ -153,8 +140,7 @@ static {
         } catch (java.beans.PropertyVetoException e) {
             e.printStackTrace();
         }
-        subOpcion3Frame.toFront();          
-
+        subOpcion3Frame.toFront();
     }
 
     protected void abrirSubOpcion4() {
@@ -166,12 +152,11 @@ static {
         } catch (java.beans.PropertyVetoException e) {
             e.printStackTrace();
         }
-        subOpcion4Frame.toFront();          
-
+        subOpcion4Frame.toFront();
     }
 
     protected void abrirSubOpcion5() {
-        SubOpcion5EstadoDeCuentas subOpcion5Frame = new SubOpcion5EstadoDeCuentas();
+        SubOpcion5CancelacionDeTarjeta subOpcion5Frame = new SubOpcion5CancelacionDeTarjeta();
         desktopPane.add(subOpcion5Frame);
         subOpcion5Frame.setVisible(true);
         try {
@@ -179,16 +164,11 @@ static {
         } catch (java.beans.PropertyVetoException e) {
             e.printStackTrace();
         }
-        subOpcion5Frame.toFront();          
-
+        subOpcion5Frame.toFront();
     }
     
-    protected void abrirSubOpcion6(){
-        
-    }
-    
-    protected void abrirSubOpcion7() {
-        SubOpcion7CancelacionDeTarjeta subOpcion7Frame = new SubOpcion7CancelacionDeTarjeta();
+    protected void abrirSubOpcion6() {
+        SubOpcion6Reportes subOpcion7Frame = new SubOpcion6Reportes();
         desktopPane.add(subOpcion7Frame);
         subOpcion7Frame.setVisible(true);
         try {
@@ -196,7 +176,6 @@ static {
         } catch (java.beans.PropertyVetoException e) {
             e.printStackTrace();
         }
-        subOpcion7Frame.toFront();          
-        
+        subOpcion7Frame.toFront();
     }
 }

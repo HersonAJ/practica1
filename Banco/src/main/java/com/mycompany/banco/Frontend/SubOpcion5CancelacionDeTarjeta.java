@@ -18,11 +18,11 @@ import javax.swing.JTextField;
  *
  * @author herson
  */
-public class SubOpcion7CancelacionDeTarjeta extends JInternalFrame {
+public class SubOpcion5CancelacionDeTarjeta extends JInternalFrame {
     
     protected JTextField numeroTarjeta;
     
-    public SubOpcion7CancelacionDeTarjeta(){
+    public SubOpcion5CancelacionDeTarjeta(){
         setTitle("Cancenalacion de Tarjtas");
         setSize(500,400);
         setClosable(true);
