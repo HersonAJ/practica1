@@ -10,10 +10,6 @@ package com.mycompany.banco.Backend;
  * @author herson
  */
 public class Tarjeta {
-    public enum TipoTarjeta {
-        NACIONAL, REGIONAL, INTERNACIONAL
-    }
-
     private String numeroTarjeta;
     private TipoTarjeta tipoTarjeta;
     private double limite;
@@ -21,6 +17,30 @@ public class Tarjeta {
     private String direccionCliente;
     private String estadoTarjeta;
     private int numeroSolicitud;
+
+    public TipoTarjeta getTipoTarjeta() {
+        return tipoTarjeta;
+    }
+
+    public double getLimite() {
+        return limite;
+    }
+
+    public String getNombreCliente() {
+        return nombreCliente;
+    }
+
+    public String getDireccionCliente() {
+        return direccionCliente;
+    }
+
+    public String getEstadoTarjeta() {
+        return estadoTarjeta;
+    }
+
+    public int getNumeroSolicitud() {
+        return numeroSolicitud;
+    }
 
     public Tarjeta(String numeroTarjeta, TipoTarjeta tipoTarjeta, double limite, String nombreCliente, String direccionCliente, String estadoTarjeta, int numeroSolicitud) {
         this.numeroTarjeta = numeroTarjeta;
@@ -35,6 +55,5 @@ public class Tarjeta {
     public String getNumeroTarjeta() {
         return numeroTarjeta;
     }
-
 }
 
