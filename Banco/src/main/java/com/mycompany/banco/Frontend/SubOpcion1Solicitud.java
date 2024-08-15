@@ -8,10 +8,10 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.text.SimpleDateFormat;
+import java.sql.SQLException;
+import java.time.LocalDate;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -114,7 +114,32 @@ private void validarCampos() {
         campoSalario.getText().isEmpty() ||
         campoDireccion.getText().isEmpty()) {
         JOptionPane.showMessageDialog(this, "Todos los campos deben estar llenos", "Error", JOptionPane.ERROR_MESSAGE);
-    } 
+    } else {
+        try {
+            int numeroSolicitud = Integer.parseInt(campoNumeroSolicitud.getText());
+            LocalDate fecha = LocalDate.now(); // Usar la fecha del sistema
+            String tipo = (String) tipoCombo.getSelectedItem();
+            String nombre = campoNombreCompleto.getText();
+            double salario = Double.parseDouble(campoSalario.getText());
+            String direccion = campoDireccion.getText();
+            String estado = "PENDIENTE"; // Estado inicial de la solicitud
+
+            Solicitud solicitud = new Solicitud(numeroSolicitud, fecha, tipo, nombre, salario, direccion, estado);
+            solicitud.guardarEnBaseDeDatos();
+            JOptionPane.showMessageDialog(this, "Solicitud enviada correctamente y guardada en la base de datos", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            
+            limpiarCampos(); // Limpiar los campos después de enviar la solicitud
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al procesar la solicitud: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }
 
+    private void limpiarCampos() throws SQLException {
+        campoNumeroSolicitud.setText(String.valueOf(Solicitud.obtenerUltimoNumeroSolicitud() + 1)); // Actualizar el número de solicitud
+        tipoCombo.setSelectedIndex(0);
+        campoNombreCompleto.setText("");
+        campoSalario.setText("");
+        campoDireccion.setText("");
+    }
 }
