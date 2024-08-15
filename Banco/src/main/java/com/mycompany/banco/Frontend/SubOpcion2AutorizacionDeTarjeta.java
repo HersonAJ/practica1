@@ -31,12 +31,10 @@ public class SubOpcion2AutorizacionDeTarjeta extends JInternalFrame {
         setResizable(true);
         setVisible(true);
 
-        // Configuración del panel
         JPanel autorizacion = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Elementos del formulario
         gbc.gridx = 0;
         gbc.gridy = 0;
         autorizacion.add(new JLabel("Número de Solicitud"), gbc);
@@ -46,7 +44,6 @@ public class SubOpcion2AutorizacionDeTarjeta extends JInternalFrame {
         numeroSolicitud = new JTextField(20);
         autorizacion.add(numeroSolicitud, gbc);
 
-        // Botón consulta
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
@@ -54,19 +51,20 @@ public class SubOpcion2AutorizacionDeTarjeta extends JInternalFrame {
         autorizar.addActionListener(e -> validarCampos());
         autorizacion.add(autorizar, gbc);
 
-        // Botón de recarga
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
-        JButton recargar = new JButton("Recargar Solicitudes");
-        autorizacion.add(recargar, gbc);
+        JButton cancelar = new JButton("Cancelar Solicitud");
+        //cancelar.addActionListener();
+        autorizacion.add(cancelar, gbc);
 
         add(autorizacion, BorderLayout.CENTER);
     }
-    
+
     protected void validarCampos() {
         if (numeroSolicitud.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "El número de solicitud no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        } 
     }
+
 }

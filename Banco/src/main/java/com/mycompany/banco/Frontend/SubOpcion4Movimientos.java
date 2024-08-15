@@ -10,6 +10,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -121,16 +122,19 @@ public class SubOpcion4Movimientos extends JInternalFrame {
         add(formularioMovimiento, BorderLayout.CENTER);
     }
     
-    //validacion sin espacios vacios 
-    protected void validarCampos() {
-        if (numeroTarjeta.getText().isEmpty() ||
-            fechaOperacion.getText().isEmpty() ||
-            tipoMovimiento.getSelectedItem() == null ||
-            descripcion.getText().isEmpty() ||
-            codigoEstablecimiento.getText().isEmpty() ||
-            monto.getText().isEmpty()) {
+    //validacion sin espacios vacios
+    
+protected void validarCampos() {
+    if (numeroTarjeta.getText().isEmpty() ||
+        fechaOperacion.getText().isEmpty() ||
+        tipoMovimiento.getSelectedItem() == null ||
+        descripcion.getText().isEmpty() ||
+        codigoEstablecimiento.getText().isEmpty() ||
+        monto.getText().isEmpty()) {
 
-            JOptionPane.showMessageDialog(this, "Todos los campos deben estar llenos", "Error", JOptionPane.ERROR_MESSAGE);
-        } 
-    }
+        JOptionPane.showMessageDialog(this, "Todos los campos deben estar llenos", "Error", JOptionPane.ERROR_MESSAGE);
+    } 
+
 }
+}
+

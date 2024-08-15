@@ -10,6 +10,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
@@ -28,7 +30,7 @@ public class reportesSubOpcion3ListadoDeSolicitudes extends JInternalFrame {
 
     private JTable table;
     private DefaultTableModel listadoSolicitudes;
-    private JTextField filtro1, filtro3;
+    private JTextField filtroFechaInicio, filtroFechaFin, filtro3;
     private JComboBox<String> filtro2, filtro4;
     private JButton consultar;
 
@@ -54,14 +56,22 @@ public class reportesSubOpcion3ListadoDeSolicitudes extends JInternalFrame {
         gbcFilter.fill = GridBagConstraints.HORIZONTAL;
 
         // Configuración de los filtros
-        filtro1 = new JTextField(15);
+        
+        //modificando para el filtro de fecha
+        filtroFechaInicio = new JTextField(10);
+        filtroFechaFin = new JTextField(10);
+        
         filtro2 = new JComboBox<>(new String[]{"", "INTERNACIONAL", "REGIONAL","NACIONAL"});
         filtro3 = new JTextField(15);
-        filtro4 = new JComboBox<>(new String[]{"", "PENDIENTE", "APOBADA","RECHAZADA"});
+        filtro4 = new JComboBox<>(new String[]{"", "PENDIENTE", "APROBADA","RECHAZADA"});
         consultar = new JButton("Consultar");
         consultar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                
+                    aplicarFiltros();
+                
+                    //Logger.getLogger(reportesSubOpcion3ListadoDeSolicitudes.class.getName()).log(Level.SEVERE, null, ex);
                 
             }
         });
@@ -71,35 +81,44 @@ public class reportesSubOpcion3ListadoDeSolicitudes extends JInternalFrame {
         gbcFilter.gridy = 0;
         panelFiltros.add(consultar, gbcFilter);
 
+        // Agregar los campos de fecha al panel de filtros
         gbcFilter.gridx = 1;
         gbcFilter.gridy = 0;
-        panelFiltros.add(new JLabel("Rango de Fecha: "), gbcFilter);
+        panelFiltros.add(new JLabel("Fecha Inicio (dd/mm/aaaa):"), gbcFilter);
 
         gbcFilter.gridx = 2;
         gbcFilter.gridy = 0;
-        panelFiltros.add(filtro1, gbcFilter);
+        panelFiltros.add(filtroFechaInicio, gbcFilter);
 
         gbcFilter.gridx = 3;
         gbcFilter.gridy = 0;
-        panelFiltros.add(new JLabel("Por Tipo:"), gbcFilter);
+        panelFiltros.add(new JLabel("Fecha Fin (dd/mm/aaaa):"), gbcFilter);
 
         gbcFilter.gridx = 4;
         gbcFilter.gridy = 0;
-        panelFiltros.add(filtro2, gbcFilter);
+        panelFiltros.add(filtroFechaFin, gbcFilter);
 
         gbcFilter.gridx = 5;
         gbcFilter.gridy = 0;
-        panelFiltros.add(new JLabel("Salario Mayor A:"), gbcFilter);
+        panelFiltros.add(new JLabel("Por Tipo:"), gbcFilter);
 
         gbcFilter.gridx = 6;
         gbcFilter.gridy = 0;
-        panelFiltros.add(filtro3, gbcFilter);
+        panelFiltros.add(filtro2, gbcFilter);
 
         gbcFilter.gridx = 7;
         gbcFilter.gridy = 0;
-        panelFiltros.add(new JLabel("Estado:"), gbcFilter);
+        panelFiltros.add(new JLabel("Salario Mayor A:"), gbcFilter);
 
         gbcFilter.gridx = 8;
+        gbcFilter.gridy = 0;
+        panelFiltros.add(filtro3, gbcFilter);
+
+        gbcFilter.gridx = 9;
+        gbcFilter.gridy = 0;
+        panelFiltros.add(new JLabel("Estado:"), gbcFilter);
+
+        gbcFilter.gridx = 10;
         gbcFilter.gridy = 0;
         panelFiltros.add(filtro4, gbcFilter);
 
@@ -129,5 +148,15 @@ public class reportesSubOpcion3ListadoDeSolicitudes extends JInternalFrame {
         JScrollPane mainScrollPane = new JScrollPane(mainPanel);
         add(mainScrollPane, BorderLayout.CENTER);
     }
- 
+
+
+private void aplicarFiltros() {
+    String fechaInicio = filtroFechaInicio.getText();
+    String fechaFin = filtroFechaFin.getText();
+    String tipo = (String) filtro2.getSelectedItem();
+    double salario = filtro3.getText().isEmpty() ? 0 : Double.parseDouble(filtro3.getText());
+    String estado = (String) filtro4.getSelectedItem();
+
+}
+
 }

@@ -28,7 +28,7 @@ public class reportesSubOpcion2ListadoDeTarjetas extends JInternalFrame {
 
     private JTable table;
     private DefaultTableModel listadoTarjetas;
-    private JTextField filtro2, filtro3, filtro4;
+    private JTextField filtro2, filtro3, filtroFechaInicio, filtroFechaFin;
     private JComboBox<String> filtro1, filtro5; 
     private JButton consultar;
 
@@ -54,16 +54,19 @@ public class reportesSubOpcion2ListadoDeTarjetas extends JInternalFrame {
         gbcFilter.fill = GridBagConstraints.HORIZONTAL;
 
         // Configuración de los filtros
-        filtro1 = new JComboBox<>(new String []{"INTERNACIONAL", "REGIONAL", "NACIONAL"});
+        filtro1 = new JComboBox<>(new String []{"", "INTERNACIONAL", "REGIONAL", "NACIONAL"});
         filtro2 = new JTextField(15);
         filtro3 = new JTextField(15);
-        filtro4 = new JTextField(15);
-        filtro5 = new JComboBox<>(new String []{"ACTIVA", "CANCELADA"});
+        
+        filtroFechaInicio = new JTextField(10);
+        filtroFechaFin = new JTextField(10);
+        
+        filtro5 = new JComboBox<>(new String []{"", "ACTIVA", "CANCELADA"});
         consultar = new JButton("Consultar");
         consultar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                
+                aplicarFiltros();
             }
         });
 
@@ -98,17 +101,25 @@ public class reportesSubOpcion2ListadoDeTarjetas extends JInternalFrame {
 
         gbcFilter.gridx = 7;
         gbcFilter.gridy = 0;
-        panelFiltros.add(new JLabel("Rango de Fecha:"), gbcFilter);
+        panelFiltros.add(new JLabel("Fecha Inicio (dd/mm/aaaa):"), gbcFilter);
 
         gbcFilter.gridx = 8;
         gbcFilter.gridy = 0;
-        panelFiltros.add(filtro4, gbcFilter);
+        panelFiltros.add(filtroFechaInicio, gbcFilter);
 
         gbcFilter.gridx = 9;
         gbcFilter.gridy = 0;
-        panelFiltros.add(new JLabel("Por Estado:"), gbcFilter);
+        panelFiltros.add(new JLabel("Fecha Fin (dd/mm/aaaa):"), gbcFilter);
 
         gbcFilter.gridx = 10;
+        gbcFilter.gridy = 0;
+        panelFiltros.add(filtroFechaFin, gbcFilter);
+
+        gbcFilter.gridx = 11;
+        gbcFilter.gridy = 0;
+        panelFiltros.add(new JLabel("Por Estado:"), gbcFilter);
+
+        gbcFilter.gridx = 12;
         gbcFilter.gridy = 0;
         panelFiltros.add(filtro5, gbcFilter);
 
@@ -119,7 +130,7 @@ public class reportesSubOpcion2ListadoDeTarjetas extends JInternalFrame {
         mainPanel.add(panelFiltros, gbc);
 
         // Crear el modelo de la tabla
-        String[] columnNames = {"NUMERO TARJETA", "TIPO DE TARJETA", "LIMITE", "NOMBRE", "DIRECCION", "ESTADO"};
+        String[] columnNames = {"NUMERO TARJETA", "TIPO DE TARJETA", "LIMITE", "NOMBRE", "DIRECCION", "FECHA", "ESTADO"};
         listadoTarjetas = new DefaultTableModel(columnNames, 0);
         table = new JTable(listadoTarjetas);
 
@@ -137,4 +148,17 @@ public class reportesSubOpcion2ListadoDeTarjetas extends JInternalFrame {
         JScrollPane mainScrollPane = new JScrollPane(mainPanel);
         add(mainScrollPane, BorderLayout.CENTER);
     }
+
+private void aplicarFiltros() {
+    String tipo = (String) filtro1.getSelectedItem();
+    String nombre = filtro2.getText().trim();
+    double limite = 0;
+    String fechaInicio = filtroFechaInicio.getText().trim();
+    String fechaFin = filtroFechaFin.getText().trim();
+    String estado = (String) filtro5.getSelectedItem();
+
+   
+}
+
+
 }

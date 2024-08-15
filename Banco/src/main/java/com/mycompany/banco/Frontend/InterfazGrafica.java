@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -45,8 +46,9 @@ public class InterfazGrafica extends JFrame {
 
     public InterfazGrafica() {
         setTitle("Banco");
-        setSize(800, 550);
+        //setSize(800, 550);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         desktopPane = new JDesktopPane();
         getContentPane().add(desktopPane);
@@ -54,6 +56,7 @@ public class InterfazGrafica extends JFrame {
         // Crear un JPanel para la imagen
         JPanel logo = new JPanel();
         ImageIcon banco = null;
+
 
         try {
             banco = new ImageIcon(getClass().getResource("/banco.jpg"));
@@ -118,11 +121,12 @@ public class InterfazGrafica extends JFrame {
     }
 
     private void abrirEntradaTexto() {
-        //EntradaTextoInternalFrame entradaTextoFrame = new EntradaTextoInternalFrame();  cambie esto para abrir la nueva ventana para cargar el archivo
+       
         EntradaArchivo entradaTextoFrame = new EntradaArchivo();
         desktopPane.add(entradaTextoFrame);
         entradaTextoFrame.setVisible(true);
         entradaTextoFrame.toFront();
+        maximizarVentana(entradaTextoFrame);
         
     }
 
@@ -131,6 +135,16 @@ public class InterfazGrafica extends JFrame {
         desktopPane.add(entradaManualFrame);
         entradaManualFrame.setVisible(true);
         entradaManualFrame.toFront();
+        maximizarVentana(entradaManualFrame);
     }
 
+        private void maximizarVentana(JInternalFrame frame) {
+        try {
+            frame.setMaximum(true);
+            frame.setSelected(true);
+        } catch (java.beans.PropertyVetoException e) {
+            e.printStackTrace();
+        }
+        frame.toFront();
+    }
 }
