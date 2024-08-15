@@ -4,6 +4,7 @@
 
 package com.mycompany.banco;
 
+import com.mycompany.banco.Backend.ConexionMySQL;
 import com.mycompany.banco.Frontend.InterfazGrafica;
 
 /**
@@ -13,6 +14,7 @@ import com.mycompany.banco.Frontend.InterfazGrafica;
 public class Banco {
 
     public static void main(String[] args) {
+        ConexionMySQL coneccion = new ConexionMySQL();
         InterfazGrafica ventana = new InterfazGrafica();
     }
 }
