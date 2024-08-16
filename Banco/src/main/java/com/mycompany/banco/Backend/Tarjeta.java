@@ -4,6 +4,10 @@
  */
 package com.mycompany.banco.Backend;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 
 /**
  *
@@ -55,5 +59,23 @@ public class Tarjeta {
     public String getNumeroTarjeta() {
         return numeroTarjeta;
     }
+
+    public void guardarEnBaseDeDatos(Connection connection) throws SQLException {
+        String sql = "INSERT INTO Tarjeta (numero_tarjeta, tipo_tarjeta, limite, nombre_cliente, direccion_cliente, estado_tarjeta, numero_solicitud) VALUES ('" 
+                     + numeroTarjeta + "', '" 
+                     + tipoTarjeta.name() + "', " 
+                     + limite + ", '" 
+                     + nombreCliente + "', '" 
+                     + direccionCliente + "', '" 
+                     + estadoTarjeta + "', " 
+                     + numeroSolicitud + ")";
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
 }
 
