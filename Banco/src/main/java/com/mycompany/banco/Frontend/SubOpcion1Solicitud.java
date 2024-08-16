@@ -4,6 +4,7 @@
  */
 package com.mycompany.banco.Frontend;
 
+import com.mycompany.banco.Backend.Solicitud;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -30,7 +31,7 @@ public class SubOpcion1Solicitud extends JInternalFrame {
     private final JTextField campoSalario;
     private final JTextField campoDireccion;
 
-    public SubOpcion1Solicitud() {
+    public SubOpcion1Solicitud() throws SQLException {
         setTitle("Solicitudes");
         setSize(500, 500);
         setClosable(true);
@@ -54,7 +55,7 @@ public class SubOpcion1Solicitud extends JInternalFrame {
         gbc.gridy = 0;
         campoNumeroSolicitud = new JTextField(20);
         campoNumeroSolicitud.setEditable(false); 
-        //campoNumeroSolicitud.setText(String.valueOf());
+        campoNumeroSolicitud.setText(String.valueOf(Solicitud.obtenerUltimoNumeroSolicitud() + 1));
         formulario.add(campoNumeroSolicitud, gbc);
 
         // Elementos de la segunda fila
@@ -143,3 +144,4 @@ private void validarCampos() {
         campoDireccion.setText("");
     }
 }
+
