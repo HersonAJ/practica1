@@ -4,11 +4,11 @@
  */
 package com.mycompany.banco.Frontend;
 
+import com.mycompany.banco.Backend.Movimiento;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JButton;
@@ -122,19 +122,33 @@ public class SubOpcion4Movimientos extends JInternalFrame {
         add(formularioMovimiento, BorderLayout.CENTER);
     }
     
-    //validacion sin espacios vacios
     
-protected void validarCampos() {
-    if (numeroTarjeta.getText().isEmpty() ||
-        fechaOperacion.getText().isEmpty() ||
-        tipoMovimiento.getSelectedItem() == null ||
-        descripcion.getText().isEmpty() ||
-        codigoEstablecimiento.getText().isEmpty() ||
-        monto.getText().isEmpty()) {
+    protected void validarCampos() {
+        if (numeroTarjeta.getText().isEmpty() ||
+            fechaOperacion.getText().isEmpty() ||
+            tipoMovimiento.getSelectedItem() == null ||
+            descripcion.getText().isEmpty() ||
+            codigoEstablecimiento.getText().isEmpty() ||
+            monto.getText().isEmpty()) {
 
-        JOptionPane.showMessageDialog(this, "Todos los campos deben estar llenos", "Error", JOptionPane.ERROR_MESSAGE);
-    } 
+            JOptionPane.showMessageDialog(this, "Todos los campos deben estar llenos", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            try {
+                String numTarjeta = numeroTarjeta.getText();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                Date fecha = sdf.parse(fechaOperacion.getText());
+                String tipoMov = (String) tipoMovimiento.getSelectedItem();
+                String desc = descripcion.getText();
+                String estab = codigoEstablecimiento.getText();
+                double montoOperacion = Double.parseDouble(monto.getText());
+
+                Movimiento movimiento = new Movimiento(numTarjeta, fecha, tipoMov, desc, estab, montoOperacion);
+                movimiento.guardarEnBaseDeDatos();
+                JOptionPane.showMessageDialog(this, "Movimiento registrado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al registrar el movimiento: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
 
 }
-}
-
