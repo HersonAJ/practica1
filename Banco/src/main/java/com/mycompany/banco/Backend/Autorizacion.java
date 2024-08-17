@@ -19,57 +19,63 @@ public class Autorizacion {
     private int idAutorizacion;
     private String numeroTarjeta;
     private int numeroSolicitud;
-    private Date fechaAutorizacion;
+    private LocalDate fechaAutorizacion;
 
     public Autorizacion(int numeroSolicitud) {
-        
-        
         this.numeroSolicitud = numeroSolicitud;
-        this.fechaAutorizacion = new Date();
+        this.fechaAutorizacion = LocalDate.now();
     }
-    
-        public Tarjeta autorizar() throws SQLException {
-    try (Connection connection = ConexionMySQL.getConnection()) {
-        Solicitud solicitud = obtenerSolicitud(connection, numeroSolicitud);
-        if (solicitud == null) {
-            throw new IllegalArgumentException("Solicitud no encontrada");
+
+    public Tarjeta autorizar() throws SQLException {
+        try (Connection connection = ConexionMySQL.getConnection()) {
+            Solicitud solicitud = obtenerSolicitud(connection, numeroSolicitud);
+            if (solicitud == null) {
+                throw new IllegalArgumentException("Solicitud no encontrada");
+            }
+
+            // Verificar si la solicitud ya está aprobada
+            if ("APROBADA".equals(solicitud.getEstado())) {
+                throw new IllegalArgumentException("La solicitud ya está aprobada y no puede ser autorizada nuevamente");
+            }
+
+            double salario = solicitud.getSalario();
+            double limite = calcularLimiteCredito(salario);
+            String tipoSolicitud = solicitud.getTipo();
+            boolean autorizada = verificarAutorizacion(limite, tipoSolicitud);
+            String motivoRechazo = "";
+
+            if (!autorizada) {
+                motivoRechazo = obtenerMotivoRechazo(tipoSolicitud, limite);
+            }
+
+            if (autorizada) {
+                // Instanciar la clase GeneradorNumeroTarjeta (sin usar Singleton)
+                ConexionMySQL conexion = new ConexionMySQL();
+                GeneradorNumeroTarjeta generador = new GeneradorNumeroTarjeta(conexion);
+
+                String numeroTarjeta;
+                do {
+                    numeroTarjeta = generador.generarNumeroSecuencial(TipoTarjeta.valueOf(tipoSolicitud));
+                } while (numeroTarjetaExiste(connection, numeroTarjeta));
+
+                Tarjeta tarjeta = new Tarjeta(numeroTarjeta, TipoTarjeta.valueOf(tipoSolicitud), limite, solicitud.getNombre(), solicitud.getDireccion(), "ACTIVA", numeroSolicitud);
+                tarjeta.guardarEnBaseDeDatos(connection);
+
+                // Actualizar la fecha de autorización en la tabla Tarjeta
+                actualizarFechaUltimoEstado(connection, numeroTarjeta, LocalDate.now());
+
+                guardarAutorizacionEnBaseDeDatos(connection, numeroTarjeta, numeroSolicitud, LocalDate.now());
+                actualizarEstadoSolicitud(connection, numeroSolicitud, "APROBADA", null);
+                return tarjeta;
+            } else {
+                actualizarEstadoSolicitud(connection, numeroSolicitud, "RECHAZADA", motivoRechazo);
+                throw new IllegalArgumentException(motivoRechazo);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
         }
-
-        double salario = solicitud.getSalario();
-        double limite = calcularLimiteCredito(salario);
-        String tipoSolicitud = solicitud.getTipo();
-        boolean autorizada = verificarAutorizacion(limite, tipoSolicitud);
-        String motivoRechazo = "";
-
-        if (!autorizada) {
-            motivoRechazo = obtenerMotivoRechazo(tipoSolicitud, limite);
-        }
-
-        if (autorizada) {
-            // Instanciar la clase GeneradorNumeroTarjeta (sin usar Singleton)
-            ConexionMySQL conexion = new ConexionMySQL();
-            GeneradorNumeroTarjeta generador = new GeneradorNumeroTarjeta(conexion);
-            
-            String numeroTarjeta;
-            do {
-                numeroTarjeta = generador.generarNumeroSecuencial(TipoTarjeta.valueOf(tipoSolicitud));
-            } while (numeroTarjetaExiste(connection, numeroTarjeta));
-
-            // Crear la tarjeta y guardar en la base de datos
-            Tarjeta tarjeta = new Tarjeta(numeroTarjeta, TipoTarjeta.valueOf(tipoSolicitud), limite, solicitud.getNombre(), solicitud.getDireccion(), "ACTIVA", numeroSolicitud);
-            tarjeta.guardarEnBaseDeDatos(connection);
-            guardarAutorizacionEnBaseDeDatos(connection, numeroTarjeta, numeroSolicitud, LocalDate.now());
-            actualizarEstadoSolicitud(connection, numeroSolicitud, "APROBADA", null);
-            return tarjeta;
-        } else {
-            actualizarEstadoSolicitud(connection, numeroSolicitud, "RECHAZADA", motivoRechazo);
-            throw new IllegalArgumentException(motivoRechazo);
-        }
-    } catch (SQLException e) {
-        e.printStackTrace();
-        throw e;
     }
-}
 
     private double calcularLimiteCredito(double salario) {
         return salario * 0.6;
@@ -100,7 +106,6 @@ public class Autorizacion {
                 throw new IllegalArgumentException("Tipo de solicitud desconocido");
         }
     }
-
 
     private boolean numeroTarjetaExiste(Connection connection, String numeroTarjeta) throws SQLException {
         boolean existe = false;
@@ -155,6 +160,16 @@ public class Autorizacion {
 
     public void actualizarEstadoSolicitud(Connection connection, int numeroSolicitud, String estado, String motivoRechazo) throws SQLException {
         String sql = "UPDATE Solicitud SET estado = '" + estado + "', fecha_estado = '" + java.sql.Date.valueOf(LocalDate.now()) + "', motivo_rechazo = '" + motivoRechazo + "' WHERE numero_solicitud = " + numeroSolicitud;
+        try (Statement stmt = connection.createStatement()) {
+            stmt.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    private void actualizarFechaUltimoEstado(Connection connection, String numeroTarjeta, LocalDate fechaUltimoEstado) throws SQLException {
+        String sql = "UPDATE Tarjeta SET fecha_ultimo_estado = '" + java.sql.Date.valueOf(fechaUltimoEstado) + "' WHERE numero_tarjeta = '" + numeroTarjeta + "'";
         try (Statement stmt = connection.createStatement()) {
             stmt.executeUpdate(sql);
         } catch (SQLException e) {
