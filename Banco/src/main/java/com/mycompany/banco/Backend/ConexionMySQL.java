@@ -6,6 +6,8 @@ package com.mycompany.banco.Backend;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
@@ -57,4 +59,49 @@ public class ConexionMySQL {
             e.printStackTrace();
         }
     }
+    
+    public ResultSet obtenerListadoSolicitudes(String fechaInicio, String fechaFin, String tipo, double salario, String estado) throws SQLException {
+        ResultSet rs = null;
+        try {
+            Connection connection = getConnection();
+            StringBuilder sql = new StringBuilder("SELECT * FROM Solicitud WHERE 1=1");
+
+            if (fechaInicio != null && !fechaInicio.isEmpty() && fechaFin != null && !fechaFin.isEmpty()) {
+                sql.append(" AND fecha BETWEEN ? AND ?");
+            }
+            if (tipo != null && !tipo.isEmpty()) {
+                sql.append(" AND tipo = ?");
+            }
+            if (salario > 0) {
+                sql.append(" AND salario > ?");
+            }
+            if (estado != null && !estado.isEmpty()) {
+                sql.append(" AND estado = ?");
+            }
+
+            PreparedStatement stmt = connection.prepareStatement(sql.toString());
+            int paramIndex = 1;
+
+            if (fechaInicio != null && !fechaInicio.isEmpty() && fechaFin != null && !fechaFin.isEmpty()) {
+                stmt.setString(paramIndex++, fechaInicio);
+                stmt.setString(paramIndex++, fechaFin);
+            }
+            if (tipo != null && !tipo.isEmpty()) {
+                stmt.setString(paramIndex++, tipo);
+            }
+            if (salario > 0) {
+                stmt.setDouble(paramIndex++, salario);
+            }
+            if (estado != null && !estado.isEmpty()) {
+                stmt.setString(paramIndex++, estado);
+            }
+
+            rs = stmt.executeQuery();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return rs;
+    }
+    
 }

@@ -4,18 +4,24 @@
  */
 package com.mycompany.banco.Frontend;
 
+import com.mycompany.banco.Backend.ConexionMySQL;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -68,11 +74,11 @@ public class reportesSubOpcion3ListadoDeSolicitudes extends JInternalFrame {
         consultar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                
+                try {
                     aplicarFiltros();
-                
-                    //Logger.getLogger(reportesSubOpcion3ListadoDeSolicitudes.class.getName()).log(Level.SEVERE, null, ex);
-                
+                } catch (SQLException ex) {
+                    Logger.getLogger(reportesSubOpcion3ListadoDeSolicitudes.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
 
@@ -150,13 +156,60 @@ public class reportesSubOpcion3ListadoDeSolicitudes extends JInternalFrame {
     }
 
 
-private void aplicarFiltros() {
-    String fechaInicio = filtroFechaInicio.getText();
-    String fechaFin = filtroFechaFin.getText();
-    String tipo = (String) filtro2.getSelectedItem();
-    double salario = filtro3.getText().isEmpty() ? 0 : Double.parseDouble(filtro3.getText());
-    String estado = (String) filtro4.getSelectedItem();
+    private void aplicarFiltros() throws SQLException {
+        String fechaInicio = filtroFechaInicio.getText();
+        String fechaFin = filtroFechaFin.getText();
+        String tipo = (String) filtro2.getSelectedItem();
+        double salario = filtro3.getText().isEmpty() ? 0 : Double.parseDouble(filtro3.getText());
+        String estado = (String) filtro4.getSelectedItem();
 
-}
+        // Convertir las fechas al formato yyyy-MM-dd
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdfMySQL = new SimpleDateFormat("yyyy-MM-dd");
+        String fechaInicioMySQL = null;
+        String fechaFinMySQL = null;
+
+        try {
+            if (!fechaInicio.isEmpty()) {
+                fechaInicioMySQL = sdfMySQL.format(sdf.parse(fechaInicio));
+            }
+            if (!fechaFin.isEmpty()) {
+                fechaFinMySQL = sdfMySQL.format(sdf.parse(fechaFin));
+            }
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(this, "Formato de fecha incorrecto. Use dd/MM/yyyy.", "Error de formato", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        ConexionMySQL connection = new ConexionMySQL();
+        ResultSet rs = connection.obtenerListadoSolicitudes(fechaInicioMySQL, fechaFinMySQL, tipo, salario, estado);
+
+        // Limpiar la tabla antes de agregar nuevos datos
+        listadoSolicitudes.setRowCount(0);
+
+        try {
+            if (!rs.isBeforeFirst()) {
+                JOptionPane.showMessageDialog(this, "No se ha encontrado ninguna solicitud que coincida con los filtros.", "Sin resultados", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                while (rs.next()) {
+                    String numeroSolicitud = rs.getString("numero_solicitud");
+                    String fecha = rs.getString("fecha");
+                    String tipoSolicitud = rs.getString("tipo");
+                    String nombre = rs.getString("nombre");
+                    double salarioSolicitud = rs.getDouble("salario");
+                    String direccion = rs.getString("direccion");
+                    String estadoSolicitud = rs.getString("estado");
+
+                    // Convertir la fecha al formato dd/MM/yyyy
+                    String fechaFormateada = sdf.format(sdfMySQL.parse(fecha));
+
+                    listadoSolicitudes.addRow(new Object[]{numeroSolicitud, fechaFormateada, tipoSolicitud, nombre, salarioSolicitud, direccion, estadoSolicitud});
+                }
+            }
+        } catch (SQLException | ParseException e) {
+            JOptionPane.showMessageDialog(this, "Ocurrió un error al intentar obtener los datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
 
 }
