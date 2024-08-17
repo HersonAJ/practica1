@@ -4,16 +4,8 @@
  */
 package com.mycompany.banco.Frontend;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import javax.swing.JButton;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
+import java.awt.*;
+import javax.swing.*;
 /**
  *
  * @author herson

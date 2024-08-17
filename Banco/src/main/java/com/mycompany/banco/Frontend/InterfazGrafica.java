@@ -4,20 +4,10 @@
  */
 package com.mycompany.banco.Frontend;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Image;
-import static java.awt.SystemColor.info;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
+import javax.swing.*;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -83,7 +73,7 @@ public class InterfazGrafica extends JFrame {
         panelBotones.setLayout(new FlowLayout());
 
         // Crear los botones
-        JButton botonEntradaTexto = new JButton("Entrada de texto");
+        JButton botonEntradaTexto = new JButton("Cargar Archivo");
         JButton botonEntradaManual = new JButton("Entrada manual");
 
         // Agregar ActionListener a los botones
@@ -109,13 +99,6 @@ public class InterfazGrafica extends JFrame {
         panelBotones.setBounds(1, 270, 260, 70);
         desktopPane.add(panelBotones, JDesktopPane.DEFAULT_LAYER);
 
-        // Crear un menú
-        JMenuBar menuBar = new JMenuBar();
-        JMenu reportes = new JMenu("Reportes");
-        menuBar.add(reportes);
-
-        // Asignar la barra de menú al JFrame
-        setJMenuBar(menuBar);
 
         setVisible(true);
     }

@@ -8,16 +8,10 @@ import com.mycompany.banco.Backend.Autorizacion;
 import com.mycompany.banco.Backend.ConexionMySQL;
 import com.mycompany.banco.Backend.Solicitud;
 import com.mycompany.banco.Backend.Tarjeta;
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.sql.Connection;
-import javax.swing.JButton;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
+
 
 /**
  *
