@@ -4,6 +4,8 @@
  */
 package com.mycompany.banco.Frontend;
 
+import com.mycompany.banco.Backend.EstadoDeCuenta;
+import com.mycompany.banco.Backend.Movimiento;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,11 +13,15 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
+import java.util.List;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -72,7 +78,7 @@ public class reportesSubOpcion1EstadoDeCuenta extends JInternalFrame {
         botonFiltrarTodo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //mostrarTodo();
+                mostrarTodo();
             }
         });
 
@@ -127,6 +133,144 @@ public class reportesSubOpcion1EstadoDeCuenta extends JInternalFrame {
         String saldoMayorAFiltro = filtro3.getText();
         String interesesMayorAFiltro = filtro4.getText();
 
+        try {
+            List<EstadoDeCuenta> estadosDeCuenta;
 
-}
+            if (!numeroTarjetaFiltro.isEmpty()) {
+                estadosDeCuenta = EstadoDeCuenta.filtrarPorNumeroTarjeta(numeroTarjetaFiltro);
+            } else if (tipoTarjetaFiltro != null && !tipoTarjetaFiltro.isEmpty()) {
+                estadosDeCuenta = EstadoDeCuenta.filtrarPorTipoTarjeta(tipoTarjetaFiltro);
+            } else if (!saldoMayorAFiltro.isEmpty()) {
+                double saldoMayorA = Double.parseDouble(saldoMayorAFiltro);
+                estadosDeCuenta = EstadoDeCuenta.filtrarPorSaldoMayorA(saldoMayorA);
+            } else if (!interesesMayorAFiltro.isEmpty()) {
+                double interesesMayorA = Double.parseDouble(interesesMayorAFiltro);
+                estadosDeCuenta = EstadoDeCuenta.filtrarPorInteresesMayorA(interesesMayorA);
+            } else {
+                JOptionPane.showMessageDialog(this, "Por favor, ingrese un filtro.");
+                return;
+            }
+
+            if (estadosDeCuenta.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No hay resultados para el reporte.");
+                return;
+            }
+
+            // Limpiar el panel principal antes de agregar nuevos datos
+            mainPanel.removeAll();
+
+            for (EstadoDeCuenta estado : estadosDeCuenta) {
+                JPanel tarjetaPanel = new JPanel();
+                tarjetaPanel.setLayout(new BoxLayout(tarjetaPanel, BoxLayout.Y_AXIS));
+                tarjetaPanel.setBorder(BorderFactory.createTitledBorder("Tarjeta"));
+
+                // Información de la tarjeta
+                tarjetaPanel.add(new JLabel("Número Tarjeta: " + estado.getNumeroTarjeta()));
+                tarjetaPanel.add(new JLabel("Tipo Tarjeta: " + estado.getTipoTarjeta()));
+                tarjetaPanel.add(new JLabel("Nombre Cliente: " + estado.getNombreCliente()));
+                tarjetaPanel.add(new JLabel("Dirección Cliente: " + estado.getDireccionCliente()));
+
+                // Crear el modelo de la tabla
+                String[] columnNames = {"FECHA", "TIPO DE MOVIMIENTO", "DESCRIPCIÓN", "ESTABLECIMIENTO", "MONTO"};
+                DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+                JTable table = new JTable(tableModel);
+
+                // Agregar los movimientos a la tabla
+                for (Movimiento mov : estado.getMovimientos()) {
+                    Object[] row = {
+                        mov.getFecha(),
+                        mov.getTipoMovimiento(),
+                        mov.getDescripcion(),
+                        mov.getEstablecimiento(),
+                        mov.getMonto()
+                    };
+                    tableModel.addRow(row);
+                }
+
+                // Agregar la tabla a un JScrollPane
+                JScrollPane scrollPane = new JScrollPane(table);
+                tarjetaPanel.add(scrollPane);
+
+                // Totales
+                tarjetaPanel.add(new JLabel("Monto Total: " + String.format("%.2f", estado.getMontoTotal())));
+                tarjetaPanel.add(new JLabel("Intereses: " + String.format("%.2f", estado.getIntereses())));
+                tarjetaPanel.add(new JLabel("Saldo Total: " + String.format("%.2f", estado.getSaldoTotal())));
+
+                // Añadir el panel de la tarjeta al panel principal
+                mainPanel.add(tarjetaPanel);
+            }
+
+            // Refrescar el panel principal
+            mainPanel.revalidate();
+            mainPanel.repaint();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al obtener los datos: " + e.getMessage());
+        }
+    }
+
+
+     private void mostrarTodo() {
+        try {
+            List<EstadoDeCuenta> estadosDeCuenta = EstadoDeCuenta.obtenerTodasLasTarjetasActivas();
+
+            if (estadosDeCuenta.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No hay resultados para el reporte.");
+                return;
+            }
+
+            // Limpiar el panel principal antes de agregar nuevos datos
+            mainPanel.removeAll();
+
+            for (EstadoDeCuenta estado : estadosDeCuenta) {
+                JPanel tarjetaPanel = new JPanel();
+                tarjetaPanel.setLayout(new BoxLayout(tarjetaPanel, BoxLayout.Y_AXIS));
+                tarjetaPanel.setBorder(BorderFactory.createTitledBorder("Tarjeta"));
+
+                // Información de la tarjeta
+                tarjetaPanel.add(new JLabel("Número Tarjeta: " + estado.getNumeroTarjeta()));
+                tarjetaPanel.add(new JLabel("Tipo Tarjeta: " + estado.getTipoTarjeta()));
+                tarjetaPanel.add(new JLabel("Nombre Cliente: " + estado.getNombreCliente()));
+                tarjetaPanel.add(new JLabel("Dirección Cliente: " + estado.getDireccionCliente()));
+
+                // Crear el modelo de la tabla
+                String[] columnNames = {"FECHA", "TIPO DE MOVIMIENTO", "DESCRIPCIÓN", "ESTABLECIMIENTO", "MONTO"};
+                DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+                JTable table = new JTable(tableModel);
+
+                // Agregar los movimientos a la tabla
+                for (Movimiento mov : estado.getMovimientos()) {
+                    Object[] row = {
+                        mov.getFecha(),
+                        mov.getTipoMovimiento(),
+                        mov.getDescripcion(),
+                        mov.getEstablecimiento(),
+                        mov.getMonto()
+                    };
+                    tableModel.addRow(row);
+                }
+
+                // Agregar la tabla a un JScrollPane
+                JScrollPane scrollPane = new JScrollPane(table);
+                tarjetaPanel.add(scrollPane);
+
+                // Totales
+                tarjetaPanel.add(new JLabel("Monto Total: " + String.format("%.2f", estado.getMontoTotal())));
+                tarjetaPanel.add(new JLabel("Intereses: " + String.format("%.2f", estado.getIntereses())));
+                tarjetaPanel.add(new JLabel("Saldo Total: " + String.format("%.2f", estado.getSaldoTotal())));
+
+                // Añadir el panel de la tarjeta al panel principal
+                mainPanel.add(tarjetaPanel);
+            }
+
+            // Refrescar el panel principal
+            mainPanel.revalidate();
+            mainPanel.repaint();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al obtener los datos: " + e.getMessage());
+        }
+    }
 }

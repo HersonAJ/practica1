@@ -5,6 +5,7 @@
 package com.mycompany.banco.Frontend;
 
 import com.mycompany.banco.Backend.Cancelacion;
+import com.mycompany.banco.Backend.EstadoDeCuenta;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
