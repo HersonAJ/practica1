@@ -198,7 +198,6 @@ public class EstadoDeCuenta {
     }
 
 
-    // Getters
     public String getNumeroTarjeta() {
         return numeroTarjeta;
     }

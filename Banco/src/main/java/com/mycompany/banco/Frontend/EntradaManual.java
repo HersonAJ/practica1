@@ -39,25 +39,25 @@ public class EntradaManual extends JInternalFrame {
         // Configurar el layout del contenedor principal
         getContentPane().setLayout(new BorderLayout());
 
-        // Crear el JDesktopPane y agregarlo al centro
+        
         desktopPane = new JDesktopPane();
         getContentPane().add(desktopPane, BorderLayout.CENTER);
 
-        // Crear la barra de menú
+        
         JMenuBar menuBar = new JMenuBar();
 
-        // Crear los menús
+        
         JMenu menuOpciones = new JMenu("Opciones");
         JMenu menuReportes = new JMenu("Reportes");
 
-        // Crear los elementos del menú
+        //elementos del menú
         JMenuItem menuItemSolicitudes = new JMenuItem("Solicitudes");
         JMenuItem menuItemAutorizacion = new JMenuItem("Autorización de Tarjeta");
         JMenuItem menuItemConsultar = new JMenuItem("Consultar Tarjeta");
         JMenuItem menuItemMovimientos = new JMenuItem("Movimientos");
         JMenuItem menuItemCancelacion = new JMenuItem("Cancelación de Tarjeta");
 
-        // Crear los elementos del menú Reportes
+        // elementos del menú Reportes
         JMenuItem menuItemEstadoDeCuenta = new JMenuItem("Estado de Cuenta");
         JMenuItem menuItemListadoDeTarjetas = new JMenuItem("Listado de Tarjetas");
         JMenuItem menuItemListadoDeSolicitudes = new JMenuItem("Listado de Solicitudes");
@@ -123,14 +123,14 @@ public class EntradaManual extends JInternalFrame {
             }
         });
 
-        // Agregar los elementos al menú Opciones
+       
         menuOpciones.add(menuItemSolicitudes);
         menuOpciones.add(menuItemAutorizacion);
         menuOpciones.add(menuItemConsultar);
         menuOpciones.add(menuItemMovimientos);
         menuOpciones.add(menuItemCancelacion);
 
-        // Agregar los elementos al menú Reportes
+        
         menuReportes.add(menuItemEstadoDeCuenta);
         menuReportes.add(menuItemListadoDeTarjetas);
         menuReportes.add(menuItemListadoDeSolicitudes);
@@ -139,7 +139,7 @@ public class EntradaManual extends JInternalFrame {
         menuBar.add(menuOpciones);
         menuBar.add(menuReportes); 
 
-        // Agregar la barra de menú al frame
+       
         setJMenuBar(menuBar);
 
         setVisible(true);

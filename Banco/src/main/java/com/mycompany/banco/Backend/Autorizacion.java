@@ -49,7 +49,7 @@ public class Autorizacion {
             }
 
             if (autorizada) {
-                // Instanciar la clase GeneradorNumeroTarjeta (sin usar Singleton)
+
                 ConexionMySQL conexion = new ConexionMySQL();
                 GeneradorNumeroTarjeta generador = new GeneradorNumeroTarjeta(conexion);
 

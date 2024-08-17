@@ -19,12 +19,12 @@ public class GeneradorNumeroTarjeta {
     private int contadorRegional;
     private int contadorInternacional;
 
-    // Constructor que inicializa los contadores desde la base de datos
+    // inicializa los contadores desde la base de datos
     public GeneradorNumeroTarjeta(ConexionMySQL conexion) throws SQLException {
         inicializarContadores(conexion);
     }
 
-    // Método para inicializar los contadores desde la base de datos
+    
     private void inicializarContadores(ConexionMySQL conexion) throws SQLException {
         String sql = "SELECT tipo_tarjeta, COUNT(*) FROM Tarjeta GROUP BY tipo_tarjeta";
         try (Connection connection = conexion.getConnection();
@@ -54,7 +54,7 @@ public class GeneradorNumeroTarjeta {
         }
     }
 
-    // Método para generar el número secuencial basado en el tipo de tarjeta
+    
     public String generarNumeroSecuencial(TipoTarjeta tipo) {
         String secuencia;
         switch (tipo) {

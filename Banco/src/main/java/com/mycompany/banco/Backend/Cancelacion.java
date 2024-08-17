@@ -36,6 +36,7 @@ public class Cancelacion {
 
             // Cancelar la tarjeta
             actualizarEstadoTarjeta(connection);
+            actualizarFechaUltimoEstado(connection, LocalDate.now());
             guardarCancelacionEnBaseDeDatos(connection);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -64,6 +65,18 @@ public class Cancelacion {
         String sql = "UPDATE Tarjeta SET estado_tarjeta = 'CANCELADA' WHERE numero_tarjeta = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, numeroTarjeta);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    private void actualizarFechaUltimoEstado(Connection connection, LocalDate fechaUltimoEstado) throws SQLException {
+        String sql = "UPDATE Tarjeta SET fecha_ultimo_estado = ? WHERE numero_tarjeta = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setDate(1, java.sql.Date.valueOf(fechaUltimoEstado));
+            stmt.setString(2, numeroTarjeta);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
