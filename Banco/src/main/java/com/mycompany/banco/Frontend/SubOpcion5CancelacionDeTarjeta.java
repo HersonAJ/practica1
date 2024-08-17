@@ -4,9 +4,11 @@
  */
 package com.mycompany.banco.Frontend;
 
+import com.mycompany.banco.Backend.Cancelacion;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -69,7 +71,7 @@ public class SubOpcion5CancelacionDeTarjeta extends JInternalFrame {
         gbc.gridwidth = 2;
         confirmarCancelacion = new JButton("Confirmar Cancelación");
         confirmarCancelacion.setVisible(false);
-        //confirmarCancelacion.addActionListener();
+        confirmarCancelacion.addActionListener(e -> confirmarCancelacion());
         cancelacion.add(confirmarCancelacion, gbc);
 
         add(cancelacion, BorderLayout.CENTER);
@@ -78,7 +80,41 @@ public class SubOpcion5CancelacionDeTarjeta extends JInternalFrame {
     protected void validarCampos() {
         if (numeroTarjeta.getText().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Todos los campos deben estar llenos", "Error", JOptionPane.ERROR_MESSAGE);
-        } 
+        } else {
+            try {
+                String numTarjeta = numeroTarjeta.getText();
+                EstadoDeCuenta estadoDeCuenta = new EstadoDeCuenta(numTarjeta);
+                mostrarInformacionTarjeta(estadoDeCuenta);
+                confirmarCancelacion.setVisible(true);
+            } catch (IllegalArgumentException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Error al consultar la tarjeta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void mostrarInformacionTarjeta(EstadoDeCuenta estadoDeCuenta) {
+        String info = "<html>Tarjeta: " + estadoDeCuenta.getNumeroTarjeta() + "<br>" +
+                      "Tipo: " + estadoDeCuenta.getTipoTarjeta() + "<br>" +
+                      "Cliente: " + estadoDeCuenta.getNombreCliente() + "<br>" +
+                      "Dirección: " + estadoDeCuenta.getDireccionCliente() + "<br>" +
+                      "Saldo Total: " + estadoDeCuenta.getSaldoTotal() + "</html>";
+        infoTarjeta.setText(info);
     }
 
+    private void confirmarCancelacion() {
+        try {
+            String numTarjeta = numeroTarjeta.getText();
+            Cancelacion cancelacion = new Cancelacion(numTarjeta);
+            cancelacion.cancelar();
+            JOptionPane.showMessageDialog(this, "Tarjeta cancelada exitosamente: " + numTarjeta, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            confirmarCancelacion.setVisible(false);
+            infoTarjeta.setText("");
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al cancelar la tarjeta: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }
