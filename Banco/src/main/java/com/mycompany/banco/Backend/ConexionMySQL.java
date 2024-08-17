@@ -104,4 +104,55 @@ public class ConexionMySQL {
         return rs;
     }
     
+        public ResultSet obtenerListadoTarjetas(String tipo, String nombre, double limite, String fechaInicio, String fechaFin, String estado) throws SQLException {
+            ResultSet rs = null;
+            try {
+                Connection connection = getConnection();
+                StringBuilder sql = new StringBuilder("SELECT numero_tarjeta, tipo_tarjeta, limite, nombre_cliente, direccion_cliente, fecha_ultimo_estado, estado_tarjeta FROM Tarjeta WHERE 1=1");
+
+                if (tipo != null && !tipo.isEmpty()) {
+                    sql.append(" AND tipo_tarjeta = ?");
+                }
+                if (nombre != null && !nombre.isEmpty()) {
+                    sql.append(" AND nombre_cliente LIKE ?");
+                }
+                if (limite > 0) {
+                    sql.append(" AND limite > ?");
+                }
+                if (fechaInicio != null && !fechaInicio.isEmpty() && fechaFin != null && !fechaFin.isEmpty()) {
+                    sql.append(" AND fecha_ultimo_estado BETWEEN ? AND ?");
+                }
+                if (estado != null && !estado.isEmpty()) {
+                    sql.append(" AND estado_tarjeta = ?");
+                }
+
+                PreparedStatement stmt = connection.prepareStatement(sql.toString());
+                int paramIndex = 1;
+
+                if (tipo != null && !tipo.isEmpty()) {
+                    stmt.setString(paramIndex++, tipo);
+                }
+                if (nombre != null && !nombre.isEmpty()) {
+                    stmt.setString(paramIndex++, "%" + nombre + "%");
+                }
+                if (limite > 0) {
+                    stmt.setDouble(paramIndex++, limite);
+                }
+                if (fechaInicio != null && !fechaInicio.isEmpty() && fechaFin != null && !fechaFin.isEmpty()) {
+                    stmt.setString(paramIndex++, fechaInicio);
+                    stmt.setString(paramIndex++, fechaFin);
+                }
+                if (estado != null && !estado.isEmpty()) {
+                    stmt.setString(paramIndex++, estado);
+                }
+
+                rs = stmt.executeQuery();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw e;
+            }
+            return rs;
+        }
+
+    
 }

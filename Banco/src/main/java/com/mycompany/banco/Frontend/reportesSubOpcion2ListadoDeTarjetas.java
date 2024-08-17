@@ -4,16 +4,22 @@
  */
 package com.mycompany.banco.Frontend;
 
+import com.mycompany.banco.Backend.ConexionMySQL;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -70,7 +76,7 @@ public class reportesSubOpcion2ListadoDeTarjetas extends JInternalFrame {
             }
         });
 
-        // Agregar el botón "Filtrar" al principio, seguido de los campos
+        // Agregar el botón "Filtrar" al principio
         gbcFilter.gridx = 0;
         gbcFilter.gridy = 0;
         panelFiltros.add(consultar, gbcFilter);
@@ -149,15 +155,83 @@ public class reportesSubOpcion2ListadoDeTarjetas extends JInternalFrame {
         add(mainScrollPane, BorderLayout.CENTER);
     }
 
-private void aplicarFiltros() {
-    String tipo = (String) filtro1.getSelectedItem();
-    String nombre = filtro2.getText().trim();
-    double limite = 0;
-    String fechaInicio = filtroFechaInicio.getText().trim();
-    String fechaFin = filtroFechaFin.getText().trim();
-    String estado = (String) filtro5.getSelectedItem();
+    private void aplicarFiltros() {
+        String tipo = (String) filtro1.getSelectedItem();
+        String nombre = filtro2.getText().trim();
+        double limite = 0;
+        String fechaInicio = filtroFechaInicio.getText().trim();
+        String fechaFin = filtroFechaFin.getText().trim();
+        String estado = (String) filtro5.getSelectedItem();
 
-   
+        // Validación para el campo de límite
+        if (!filtro3.getText().trim().isEmpty()) {
+            try {
+                limite = Double.parseDouble(filtro3.getText().trim());
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "El límite debe ser un número válido.", "Error de Validación", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
+        // Convertir las fechas al formato yyyy-MM-dd
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdfMySQL = new SimpleDateFormat("yyyy-MM-dd");
+        String fechaInicioMySQL = null;
+        String fechaFinMySQL = null;
+
+        try {
+            if (!fechaInicio.isEmpty()) {
+                fechaInicioMySQL = sdfMySQL.format(sdf.parse(fechaInicio));
+            }
+            if (!fechaFin.isEmpty()) {
+                fechaFinMySQL = sdfMySQL.format(sdf.parse(fechaFin));
+            }
+        } catch (ParseException e) {
+            JOptionPane.showMessageDialog(this, "Formato de fecha incorrecto. Use dd/MM/yyyy.", "Error de formato", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Limpiar la tabla antes de agregar nuevos datos
+        listadoTarjetas.setRowCount(0);
+
+        ConexionMySQL conection = new ConexionMySQL();
+        ResultSet rs = null;
+
+        try {
+            rs = conection.obtenerListadoTarjetas(tipo, nombre, limite, fechaInicioMySQL, fechaFinMySQL, estado);
+
+            boolean hasResults = false;
+
+            while (rs.next()) {
+                hasResults = true;
+                String numeroTarjeta = rs.getString("numero_tarjeta");
+                String tipoTarjeta = rs.getString("tipo_tarjeta");
+                double limiteTarjeta = rs.getDouble("limite");
+                String nombreCliente = rs.getString("nombre_cliente");
+                String direccion = rs.getString("direccion_cliente");
+                String estadoTarjeta = rs.getString("estado_tarjeta");
+                String fechaEstado = rs.getString("fecha_ultimo_estado");
+
+                // Convertir la fecha al formato dd/MM/yyyy
+                String fechaEstadoFormateada = fechaEstado != null ? sdf.format(sdfMySQL.parse(fechaEstado)) : "";
+
+                listadoTarjetas.addRow(new Object[]{numeroTarjeta, tipoTarjeta, limiteTarjeta, nombreCliente, direccion, fechaEstadoFormateada, estadoTarjeta});
+            }
+
+            if (!hasResults) {
+                JOptionPane.showMessageDialog(this, "No se han encontrado resultados.", "Sin Resultados", JOptionPane.INFORMATION_MESSAGE);
+            }
+        } catch (SQLException | ParseException e) {
+            JOptionPane.showMessageDialog(this, "Error al realizar la consulta: " + e.getMessage(), "Error de Consulta", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 }
 
 
