@@ -8,11 +8,13 @@ import com.mycompany.banco.Frontend.EntradaArchivo;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -47,9 +49,9 @@ public class operadorDeArchivo {
         } else if (linea.startsWith("ESTADO_CUENTA(")) {
             ejecutarEstadoCuenta(linea);
         } else if (linea.startsWith("LISTADO_TARJETAS(")) {
-            //metodos para listado de tarjeta por medio del archivo
+            ejecutarListadoTarjetas(linea);
         } else if (linea.startsWith("LISTADO_SOLICITUDES(")) {
-            //metodos para listado de solicitud por medio del archivo
+            ejecutarListadoSolicitudes(linea);
         } else {
             logArea.append("Línea no válida: " + linea + "\n");
         }
@@ -335,6 +337,189 @@ public class operadorDeArchivo {
         String rutaArchivo = EntradaArchivo.rutaSeleccionada + "/" + nombreArchivo;
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivo))) {
             writer.write(htmlContent.toString());
+        }
+    }
+    
+    private void ejecutarListadoTarjetas(String line) {
+        try {
+            // descomponer la línea para extraer los filtros
+            String[] parts = line.substring(line.indexOf('(') + 1, line.lastIndexOf(')')).split(",");
+            String tipo = parts.length > 0 ? parts[0].trim() : "";
+            String limiteStr = parts.length > 1 ? parts[1].trim() : "";
+            String fechaInicialStr = parts.length > 2 ? parts[2].trim() : "";
+            String fechaFinalStr = parts.length > 3 ? parts[3].trim() : "";
+            String estado = parts.length > 4 ? parts[4].trim() : "";
+
+            // Construir la consulta SQL con los filtros
+            StringBuilder query = new StringBuilder("SELECT * FROM Tarjeta WHERE 1=1");
+            if (!tipo.isEmpty()) query.append(" AND tipo_tarjeta = ?");
+            if (!limiteStr.isEmpty()) query.append(" AND limite > ?");
+            if (!fechaInicialStr.isEmpty()) query.append(" AND fecha_ultimo_estado >= ?");
+            if (!fechaFinalStr.isEmpty()) query.append(" AND fecha_ultimo_estado <= ?");
+            if (!estado.isEmpty()) query.append(" AND estado_tarjeta = ?");
+
+            // Obtener la conexión y preparar la consulta
+            Connection connection = ConexionMySQL.getConnection();
+            try (PreparedStatement stmt = connection.prepareStatement(query.toString())) {
+                int index = 1;
+                if (!tipo.isEmpty()) stmt.setString(index++, tipo);
+                if (!limiteStr.isEmpty()) stmt.setBigDecimal(index++, new BigDecimal(limiteStr));
+                if (!fechaInicialStr.isEmpty()) stmt.setDate(index++, new java.sql.Date(parseDate(fechaInicialStr).getTime()));
+                if (!fechaFinalStr.isEmpty()) stmt.setDate(index++, new java.sql.Date(parseDate(fechaFinalStr).getTime()));
+                if (!estado.isEmpty()) stmt.setString(index++, estado);
+
+                ResultSet rs = stmt.executeQuery();
+                StringBuilder html = new StringBuilder();
+                html.append("<html><head><title>Listado de Tarjetas</title><style>")
+                    .append("table { width: 100%; border-collapse: collapse; }")
+                    .append("th, td { border: 1px solid black; padding: 8px; text-align: left; }")
+                    .append("th { background-color: #f2f2f2; }")
+                    .append("</style></head><body><h1>Listado de Tarjetas</h1><table>")
+                    .append("<tr><th>Numero Tarjeta</th><th>Tipo</th><th>Limite</th><th>Nombre</th><th>Direccion</th><th>Fecha</th><th>Estado</th></tr>");
+
+                while (rs.next()) {
+                    html.append("<tr>")
+                        .append("<td>").append(rs.getString("numero_tarjeta")).append("</td>")
+                        .append("<td>").append(rs.getString("tipo_tarjeta")).append("</td>")
+                        .append("<td>").append(rs.getBigDecimal("limite")).append("</td>")
+                        .append("<td>").append(rs.getString("nombre_cliente")).append("</td>")
+                        .append("<td>").append(rs.getString("direccion_cliente")).append("</td>")
+                        .append("<td>").append(rs.getDate("fecha_ultimo_estado")).append("</td>")
+                        .append("<td>").append(rs.getString("estado_tarjeta")).append("</td>")
+                        .append("</tr>");
+                }
+
+                html.append("</table></body></html>");
+                generarArchivoHTML3(html.toString(), tipo, limiteStr, fechaInicialStr, fechaFinalStr, estado);
+
+            } catch (SQLException e) {
+                logArea.append("Error al ejecutar la consulta: " + e.getMessage() + "\n");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            logArea.append("Error al procesar LISTADO_TARJETAS: " + line + "\n");
+            e.printStackTrace();
+        }
+    }
+
+    private Date parseDate(String dateStr) throws ParseException {
+        // Eliminar comillas especiales
+        dateStr = dateStr.replace("“", "").replace("”", "").replace("\"", "");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        return sdf.parse(dateStr);
+    }
+
+    private void generarArchivoHTML3(String htmlContent, String tipo, String limiteStr, String fechaInicialStr, String fechaFinalStr, String estado) {
+        try {
+            // Limpiar comillas especiales de las fechas
+            fechaInicialStr = fechaInicialStr.replace("“", "").replace("”", "").replace("\"", "").replace("/", "_");
+            fechaFinalStr = fechaFinalStr.replace("“", "").replace("”", "").replace("\"", "").replace("/", "_");
+
+            String nombreArchivo = "listado_tarjetas";
+            if (!tipo.isEmpty()) nombreArchivo += "_tipo_" + tipo;
+            if (!limiteStr.isEmpty()) nombreArchivo += "_limite_mayor_a_" + limiteStr;
+            if (!fechaInicialStr.isEmpty()) nombreArchivo += "_fecha_inicial_" + fechaInicialStr;
+            if (!fechaFinalStr.isEmpty()) nombreArchivo += "_fecha_final_" + fechaFinalStr;
+            if (!estado.isEmpty()) nombreArchivo += "_estado_" + estado;
+            nombreArchivo += ".html";
+
+            String rutaArchivo = EntradaArchivo.rutaSeleccionada + "/" + nombreArchivo;
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivo))) {
+                writer.write(htmlContent);
+                logArea.append("Reporte generado: " + rutaArchivo + "\n");
+            }
+        } catch (IOException e) {
+            logArea.append("Error al escribir el archivo HTML: " + e.getMessage() + "\n");
+            e.printStackTrace();
+        }
+    }
+    
+    private void ejecutarListadoSolicitudes(String line) {
+        try {
+            // descomponer la línea para extraer los filtros
+            String[] parts = line.substring(line.indexOf('(') + 1, line.lastIndexOf(')')).split(",");
+            String fechaInicioStr = parts.length > 0 ? parts[0].trim() : "";
+            String fechaFinStr = parts.length > 1 ? parts[1].trim() : "";
+            String tipo = parts.length > 2 ? parts[2].trim() : "";
+            String montoStr = parts.length > 3 ? parts[3].trim() : "";
+            String estado = parts.length > 4 ? parts[4].trim() : "";
+
+            // Construir la consulta SQL con los filtros
+            StringBuilder query = new StringBuilder("SELECT * FROM Solicitud WHERE 1=1");
+            if (!fechaInicioStr.isEmpty()) query.append(" AND fecha >= ?");
+            if (!fechaFinStr.isEmpty()) query.append(" AND fecha <= ?");
+            if (!tipo.isEmpty()) query.append(" AND tipo = ?");
+            if (!montoStr.isEmpty()) query.append(" AND salario > ?");
+            if (!estado.isEmpty()) query.append(" AND estado = ?");
+
+            // Obtener la conexión y preparar la consulta
+            Connection connection = ConexionMySQL.getConnection();
+            try (PreparedStatement stmt = connection.prepareStatement(query.toString())) {
+                int index = 1;
+                if (!fechaInicioStr.isEmpty()) stmt.setDate(index++, new java.sql.Date(parseDate(fechaInicioStr).getTime()));
+                if (!fechaFinStr.isEmpty()) stmt.setDate(index++, new java.sql.Date(parseDate(fechaFinStr).getTime()));
+                if (!tipo.isEmpty()) stmt.setString(index++, tipo);
+                if (!montoStr.isEmpty()) stmt.setBigDecimal(index++, new BigDecimal(montoStr));
+                if (!estado.isEmpty()) stmt.setString(index++, estado);
+
+                ResultSet rs = stmt.executeQuery();
+                StringBuilder html = new StringBuilder();
+                html.append("<html><head><title>Listado de Solicitudes</title><style>")
+                    .append("table { width: 100%; border-collapse: collapse; }")
+                    .append("th, td { border: 1px solid black; padding: 8px; text-align: left; }")
+                    .append("th { background-color: #f2f2f2; }")
+                    .append("</style></head><body><h1>Listado de Solicitudes</h1><table>")
+                    .append("<tr><th>Numero Solicitud</th><th>Fecha</th><th>Tipo</th><th>Nombre</th><th>Salario</th><th>Direccion</th><th>Estado</th><th>Fecha Estado</th><th>Motivo Rechazo</th></tr>");
+
+                while (rs.next()) {
+                    html.append("<tr>")
+                        .append("<td>").append(rs.getInt("numero_solicitud")).append("</td>")
+                        .append("<td>").append(rs.getDate("fecha")).append("</td>")
+                        .append("<td>").append(rs.getString("tipo")).append("</td>")
+                        .append("<td>").append(rs.getString("nombre")).append("</td>")
+                        .append("<td>").append(rs.getBigDecimal("salario")).append("</td>")
+                        .append("<td>").append(rs.getString("direccion")).append("</td>")
+                        .append("<td>").append(rs.getString("estado")).append("</td>")
+                        .append("<td>").append(rs.getDate("fecha_estado")).append("</td>")
+                        .append("<td>").append(rs.getString("motivo_rechazo")).append("</td>")
+                        .append("</tr>");
+                }
+
+                html.append("</table></body></html>");
+                generarArchivoHTML4(html.toString(), fechaInicioStr, fechaFinStr, tipo, montoStr, estado);
+
+            } catch (SQLException e) {
+                logArea.append("Error al ejecutar la consulta: " + e.getMessage() + "\n");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            logArea.append("Error al procesar LISTADO_SOLICITUDES: " + line + "\n");
+            e.printStackTrace();
+        }
+    }
+
+    private void generarArchivoHTML4(String htmlContent, String fechaInicioStr, String fechaFinStr, String tipo, String montoStr, String estado) {
+        try {
+            // Limpiar comillas especiales de las fechas
+            fechaInicioStr = fechaInicioStr.replace("“", "").replace("”", "").replace("\"", "").replace("/", "_");
+            fechaFinStr = fechaFinStr.replace("“", "").replace("”", "").replace("\"", "").replace("/", "_");
+
+            String nombreArchivo = "listado_solicitudes";
+            if (!fechaInicioStr.isEmpty()) nombreArchivo += "_fecha_inicio_" + fechaInicioStr;
+            if (!fechaFinStr.isEmpty()) nombreArchivo += "_fecha_fin_" + fechaFinStr;
+            if (!tipo.isEmpty()) nombreArchivo += "_tipo_" + tipo;
+            if (!montoStr.isEmpty()) nombreArchivo += "_salario_mayor_a_" + montoStr;
+            if (!estado.isEmpty()) nombreArchivo += "_estado_" + estado;
+            nombreArchivo += ".html";
+
+            String rutaArchivo = EntradaArchivo.rutaSeleccionada + "/" + nombreArchivo;
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(rutaArchivo))) {
+                writer.write(htmlContent);
+                logArea.append("Reporte generado: " + rutaArchivo + "\n");
+            }
+        } catch (IOException e) {
+            logArea.append("Error al escribir el archivo HTML: " + e.getMessage() + "\n");
+            e.printStackTrace();
         }
     }
 }
