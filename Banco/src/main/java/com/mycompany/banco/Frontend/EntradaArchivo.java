@@ -5,26 +5,16 @@
 package com.mycompany.banco.Frontend;
 
 import com.mycompany.banco.Backend.operadorDeArchivo;
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 /**
  *
@@ -139,24 +129,24 @@ public class EntradaArchivo extends JInternalFrame {
         }
     }
 
-private void cargarArchivoAction() {
-    new Thread(() -> {
-        try {
-            File file = new File(rutaArchivo.getText());
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String linea;
-            int intervalo = (int) intervaloSpinner.getValue();
-            operadorDeArchivo ejecutor = new operadorDeArchivo(logArea);
-            while ((linea = reader.readLine()) != null) {
-                logArea.append("Leyendo:..................." + linea + "\n");
-                ejecutor.ejecutarLinea(linea);
-                Thread.sleep(intervalo);
+    private void cargarArchivoAction() {
+        new Thread(() -> {
+            try {
+                File file = new File(rutaArchivo.getText());
+                BufferedReader reader = new BufferedReader(new FileReader(file));
+                String linea;
+                int intervalo = (int) intervaloSpinner.getValue();
+                operadorDeArchivo ejecutor = new operadorDeArchivo(logArea);
+                while ((linea = reader.readLine()) != null) {
+                    logArea.append("Leyendo:..................." + linea + "\n");
+                    ejecutor.ejecutarLinea(linea);
+                    Thread.sleep(intervalo);
+                }
+                reader.close();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
             }
-            reader.close();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-    }).start();
-}
+        }).start();
+    }
 }
 

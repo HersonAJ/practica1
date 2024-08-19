@@ -18,18 +18,18 @@ import javax.swing.UIManager;
  */
 public class InterfazGrafica extends JFrame {
     static {
-    try {
-    // tema para la ventana
-        for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-            if ("Nimbus".equals(info.getName())) {
-                UIManager.setLookAndFeel(info.getClassName());
-                break;
+        try {
+        // tema para la ventana
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
 
 
     private JDesktopPane desktopPane;

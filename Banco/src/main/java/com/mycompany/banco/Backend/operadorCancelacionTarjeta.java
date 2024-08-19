@@ -19,23 +19,23 @@ public class operadorCancelacionTarjeta {
     }
         
     public void ejecutarCancelacionTarjeta(String linea) {
-    try {
-        // descomponer la línea para extraer el número de tarjeta
-        String numeroTarjeta = linea.substring(linea.indexOf('(') + 1, linea.lastIndexOf(')')).trim();
-
-        // Crear una instancia de Cancelacion y cancelar la tarjeta
-        Cancelacion cancelacion = new Cancelacion(numeroTarjeta);
         try {
-            cancelacion.cancelar();
-            logArea.append("Cancelación exitosa para la tarjeta: " + numeroTarjeta + "\n");
-        } catch (IllegalArgumentException e) {
-            logArea.append("Error en la cancelación: " + e.getMessage() + " - Tarjeta: " + numeroTarjeta + "\n");
-        }
+            // descomponer la línea para extraer el número de tarjeta
+            String numeroTarjeta = linea.substring(linea.indexOf('(') + 1, linea.lastIndexOf(')')).trim();
 
-    } catch (Exception e) {
-        logArea.append("Error al procesar CANCELACION_TARJETA: " + linea + "\n");
-        e.printStackTrace();
-    }
-}    
+            // Crear una instancia de Cancelacion y cancelar la tarjeta
+            Cancelacion cancelacion = new Cancelacion(numeroTarjeta);
+            try {
+                cancelacion.cancelar();
+                logArea.append("Cancelación exitosa para la tarjeta: " + numeroTarjeta + "\n");
+            } catch (IllegalArgumentException e) {
+                logArea.append("Error en la cancelación: " + e.getMessage() + " - Tarjeta: " + numeroTarjeta + "\n");
+            }
+
+        } catch (Exception e) {
+            logArea.append("Error al procesar CANCELACION_TARJETA: " + linea + "\n");
+            e.printStackTrace();
+        }
+    }    
     
 }
